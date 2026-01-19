@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forbes Marshall Food App</title>
+    <meta name="description" content="Food ordering app for Forbes Marshall employees">
+    <meta name="theme-color" content="#1f2937">
+    
+    <!-- PWA Manifest -->
+        
+    <!-- Mobile optimizations -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <style>
+        .login-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem auto;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .login-logo img {
+            max-width: 80px;
+            max-height: 80px;
+            object-fit: contain;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1f2937;
+            --primary-light: #374151;
+            --secondary: #10b981;
+            --background: #f9fafb;
+            --card: #ffffff;
+            --text: #111827;
+            --text-light: #6b7280;
+            --border: #e5e7eb;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: var(--background);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding-top: max(1rem, env(safe-area-inset-top));
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .role-switcher {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 25px;
+            padding: 4px;
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .role-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .role-btn.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .card-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .card-description {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .card-content {
+            padding: 1rem;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .input, .textarea, .select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px; /* Prevents zoom on iOS */
+            background: var(--card);
+            color: var(--text);
+            transition: border-color 0.2s ease;
+        }
+
+        .input:focus, .textarea:focus, .select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+        }
+
+        .textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            min-height: 44px; /* Touch target */
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover, .btn-primary:active {
+            background: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover, .btn-secondary:active {
+            background: #059669;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover, .btn-outline:active {
+            background: var(--background);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 14px;
+            min-height: auto;
+        }
+
+        /* Dish cards */
+        .dish-grid {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .dish-card {
+            background: var(--card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            position: relative;
+        }
+
+        .dish-card.main-dish {
+            border: 2px solid var(--secondary);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .dish-card.main-dish::before {
+            content: 'MAIN DISH';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--secondary);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .dish-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .dish-info {
+            padding: 1rem;
+        }
+
+        .dish-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .dish-description {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dish-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .dish-price {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .dish-category {
+            background: var(--background);
+            color: var(--text-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* Cart */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-total {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-align: right;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Orders */
+        .order-card {
+            margin-bottom: 1rem;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .order-id {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .order-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-preparing { background: #dbeafe; color: #1e40af; }
+        .status-ready { background: #d1fae5; color: #065f46; }
+        .status-completed { background: #f3f4f6; color: #374151; }
+
+        /* Notifications */
+        .notifications {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .notification {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--primary);
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.success { border-left-color: var(--success); }
+        .notification.warning { border-left-color: var(--warning); }
+        .notification.error { border-left-color: var(--error); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .dish-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dish-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Bottom navigation for mobile */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            padding: env(safe-area-inset-bottom);
+            z-index: 100;
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary);
+        }
+
+        .bottom-nav-item .icon {
+            width: 20px;
+            height: 20px;
+            margin-bottom: 0.25rem;
+            fill: currentColor;
+        }
+
+        /* Hide tabs on mobile, show bottom nav */
+        @media (max-width: 767px) {
+            .nav-tabs {
+                display: none;
+            }
+            
+            .content {
+                padding-bottom: 5rem; /* Space for bottom nav */
+            }
+        }
+
+        /* Hide bottom nav on desktop */
+        @media (min-width: 768px) {
+            .bottom-nav {
+                display: none;
+            }
+        }
+
+        /* Loading states */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Touch feedback */
+        .btn:active, .dish-card:active, .nav-tab:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Content will be dynamically loaded here -->
+    </div>
+
+    <script>
+        // Global state
+        let isLoggedIn = false;
+        let currentUser = null;
+        let currentRole = 'customer';
+        let currentTab = 'menu';
+        let adminSelectedDay = null; // Admin can override which day to show
+        
+        let users = [
+            { id: '1', username: 'admin', password: 'admin123', role: 'admin', name: 'Admin User' },
+            { id: '2', username: 'john.doe', password: 'password', role: 'customer', name: 'John Doe' },
+            { id: '3', username: 'jane.smith', password: 'password', role: 'customer', name: 'Jane Smith' }
+        ];
+
+        // Weekly menu structure (Monday to Saturday)
+        let weeklyMenu = {
+            monday: [
+                {
+                    id: 'mon-1',
+                    name: 'Poha Sample',
+                    description: 'A tasty, wholesome, and energizing breakfast',
+                    price: 40,
+                    category: 'Breakfast',
+                    isMainDish: true,
+                    image: 'poha.jpg',
+                    available: true
+                },
+                {
+                    id: 'mon-2',
+                    name: 'Tea',
+                    description: 'A refreshing and soothing beverage to kickstart your day.',
+                    price: 10,
+                    category: 'Breakfast',
+                    isMainDish: false,
+                    image: 'tea.jpg',
+                    available: true
+                },
+                {
+                    id: 'mon-3',
+                    name: 'Coffee',
+                    description: 'A rich and energizing brew to brighten your day.',
+                    price: 15,
+                    category: 'Breakfast',
+                    isMainDish: false,
+                    image: 'coffee.jpg',
+                    available: true
+                },
+                 {
+                    id: 'mon-4',
+                    name: 'Baingan Bharta',
+                    description: 'A smoky, flavorful mashed eggplant delight.',
+                    price: 40,
+                    category: 'Dry Veg',
+                    isMainDish: false,
+                    image: 'baingan-bharta.jpg',
+                    available: true
+                },
+                {
+                    id: 'mon-5',
+                    name: 'Methi Malai Mutter',
+                    description: 'Methi Malai Mutter – a creamy, aromatic curry with fenugreek and peas.',
+                    price: 60,
+                    category: 'Lunch',
+                    isMainDish: false,
+                    image: 'Mutter.png',
+                    available: true
+                }
+            ],
+            tuesday: [
+                {
+                    id: 'tue-1',
+                    name: 'Masala Dosa',
+                    description: 'Crispy crepe filled with spiced potato filling',
+                    price: 120,
+                    category: 'South Indian',
+                    isMainDish: true,
+                    image: 'masala-dosa.png',
+                    available: true
+                },
+                {
+                    id: 'tue-2',
+                    name: 'Idli Sambar',
+                    description: 'Steamed rice cakes served with lentil curry',
+                    price: 90,
+                    category: 'South Indian',
+                    isMainDish: false,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Fluffy white idli with sambar and coconut chutney served on banana leaf&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                }
+            ],
+            wednesday: [
+                {
+                    id: 'wed-1',
+                    name: 'Chicken Biryani',
+                    description: 'Aromatic basmati rice with tender chicken pieces',
+                    price: 200,
+                    category: 'Main Course',
+                    isMainDish: true,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Fragrant chicken biryani with basmati rice tender chicken pieces and aromatic spices&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                },
+                {
+                    id: 'wed-2',
+                    name: 'Raita',
+                    description: 'Cool yogurt side dish with cucumber',
+                    price: 40,
+                    category: 'Side Dish',
+                    isMainDish: false,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Fresh cucumber raita with yogurt herbs and spices in bowl&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                }
+            ],
+            thursday: [
+                {
+                    id: 'thu-1',
+                    name: 'Paneer Makhani',
+                    description: 'Cottage cheese in rich tomato gravy',
+                    price: 160,
+                    category: 'Main Course',
+                    isMainDish: true,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Creamy paneer makhani with cottage cheese in rich tomato gravy served with naan&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                },
+                {
+                    id: 'thu-2',
+                    name: 'Jeera Rice',
+                    description: 'Fragrant cumin flavored rice',
+                    price: 80,
+                    category: 'Rice',
+                    isMainDish: false,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Aromatic jeera rice with cumin seeds and basmati rice in serving bowl&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                }
+            ],
+            friday: [
+                {
+                    id: 'fri-1',
+                    name: 'Fish Curry',
+                    description: 'Fresh fish cooked in coconut curry',
+                    price: 180,
+                    category: 'Main Course',
+                    isMainDish: true,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Traditional fish curry with coconut gravy and fresh fish pieces in bowl&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                },
+                {
+                    id: 'fri-2',
+                    name: 'Coconut Rice',
+                    description: 'Rice cooked with fresh coconut',
+                    price: 90,
+                    category: 'Rice',
+                    isMainDish: false,
+                    image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Coconut rice with grated coconut and curry leaves in traditional serving&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                    available: true
+                }
+            ],
+            saturday: [
+                {
+                    id: 'sat-1',
+                    name: 'Chicken Tikka',
+                    description: 'Grilled chicken marinated in yogurt and spices',
+                    price: 200,
+                    category: 'Appetizer',
+                    isMainDish: true,
+                    image: 'chicken tikka.png',
+                    available: true
+                },
+                {
+                    id: 'sat-2',
+                    name: 'Vegetable Biryani',
+                    description: 'Fragrant basmati rice with mixed vegetables and spices',
+                    price: 150,
+                    category: 'Main Course',
+                    isMainDish: false,
+                    image: 'veg rice.png',
+                    available: true
+                }
+            ]
+        };
+
+        let orders = [];
+        let cart = [];
+        let customerName = '';
+        let notifications = [];
+
+        // Helper functions
+        function getCurrentDayDishes() {
+            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            let currentDay;
+            
+            if (adminSelectedDay) {
+                // Admin has overridden the day
+                currentDay = adminSelectedDay;
+            } else {
+                // Use today's day
+                const today = new Date().getDay();
+                currentDay = days[today];
+            }
+            
+            return weeklyMenu[currentDay] || [];
+        }
+
+        function getCurrentDayName() {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            
+            if (adminSelectedDay) {
+                // Admin has overridden the day
+                const dayIndex = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(adminSelectedDay);
+                return days[dayIndex] || 'Unknown';
+            } else {
+                // Use today's day
+                const today = new Date().getDay();
+                return days[today];
+            }
+        }
+
+        function getActualCurrentDayName() {
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const today = new Date().getDay();
+            return days[today];
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            const orderDate = new Date(date);
+            return today.toDateString() === orderDate.toDateString();
+        }
+
+        function getPopularDishes() {
+            const dishCount = {};
+            orders.forEach(order => {
+                order.dishes.forEach(item => {
+                    dishCount[item.dish.id] = (dishCount[item.dish.id] || 0) + item.quantity;
+                });
+            });
+
+            // Get all dishes from weekly menu
+            const allDishes = [];
+            Object.values(weeklyMenu).forEach(dayDishes => {
+                allDishes.push(...dayDishes);
+            });
+
+            return Object.entries(dishCount)
+                .map(([dishId, count]) => ({
+                    dish: allDishes.find(d => d.id === dishId),
+                    count
+                }))
+                .filter(item => item.dish)
+                .sort((a, b) => b.count - a.count)
+                .slice(0, 5);
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Register service worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(createServiceWorker());
+            }
+
+            // Request notification permission
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+
+            // Check if user is logged in
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                isLoggedIn = true;
+                currentRole = currentUser.role;
+                customerName = currentUser.name;
+                initializeApp();
+            } else {
+                showLoginScreen();
+            }
+        });
+
+        // Service Worker for PWA
+        function createServiceWorker() {
+            const swCode = `
+                const CACHE_NAME = 'forbes-marshall-food-v1';
+                const urlsToCache = [
+                    '/',
+                    '/offline.html'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => {
+                                if (response) {
+                                    return response;
+                                }
+                                return fetch(event.request);
+                            }
+                        )
+                    );
+                });
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            return URL.createObjectURL(blob);
+        }
+
+        // Login system
+        function showLoginScreen() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div style="min-height: 100vh; background: linear-gradient(135deg, var(--primary), var(--secondary)); display: flex; align-items: center; justify-content: center; padding: 1rem;">
+                    <div class="card" style="max-width: 400px; width: 100%;">
+                        <div class="card-header" style="text-align: center;">
+                            <!-- Company Logo -->
+                            <div class="login-logo">
+                                <img src="Logo.png" alt="Forbes Marshall logo">
+                            </div>
+                            
+                            <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🍽️</h1>
+                            <h2 class="card-title">Forbes Marshall Canteen</h2>
+                            <p class="card-description">Please login to continue</p>
+                        </div>
+                        <div class="card-content">
+                            <form onsubmit="handleLogin(event)">
+                                <div class="form-group">
+                                    <label class="label">Username</label>
+                                    <input type="text" class="input" id="username" placeholder="Enter username" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="label">Password</label>
+                                    <input type="password" class="input" id="password" placeholder="Enter password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                                    Login
+                                </button>
+                            </form>
+                            <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem;">
+                                <h4 style="margin-bottom: 1rem; color: var(--text-light); font-size: 0.875rem;">Demo Accounts:</h4>
+                                <div style="display: grid; gap: 0.5rem;">
+                                    <button class="btn btn-outline btn-small" onclick="quickLogin('admin', 'admin123')" style="text-align: left; font-size: 0.75rem;">
+                                        👤 Admin: admin / admin123
+                                    </button>
+                                    <button class="btn btn-outline btn-small" onclick="quickLogin('john.doe', 'password')" style="text-align: left; font-size: 0.75rem;">
+                                        👤 Customer: john.doe / password
+                                    </button>
+                                    <button class="btn btn-outline btn-small" onclick="quickLogin('jane.smith', 'password')" style="text-align: left; font-size: 0.75rem;">
+                                        👤 Customer: jane.smith / password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showNotification('Please enter username and password', 'warning');
+                return;
+            }
+            
+            authenticateUser(username, password);
+        }
+
+        function quickLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            authenticateUser(username, password);
+        }
+
+        function authenticateUser(username, password) {
+            const user = users.find(u => u.username === username && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                isLoggedIn = true;
+                currentRole = user.role;
+                customerName = user.name;
+                
+                // Save to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                showNotification(`Welcome ${user.name}!`, 'success');
+                initializeApp();
+            } else {
+                showNotification('Invalid username or password', 'warning');
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            currentUser = null;
+            currentRole = 'customer';
+            customerName = '';
+            adminSelectedDay = null;
+            localStorage.removeItem('currentUser');
+            showLoginScreen();
+        }
+
+        function initializeApp() {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <header class="header">
+                    <h1>🍽️ Forbes Marshall Food</h1>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        ${currentUser.role === 'admin' ? `
+                            <div class="role-switcher">
+                                <span style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">Admin Panel</span>
+                            </div>
+                        ` : `
+                            <div class="role-switcher">
+                                <span style="color: rgba(255,255,255,0.8); font-size: 0.875rem;">Welcome, ${currentUser.name}</span>
+                            </div>
+                        `}
+                        <button class="btn" onclick="logout()" style="background: rgba(255,255,255,0.1); color: white; padding: 0.5rem 1rem; font-size: 0.875rem;">
+                            Logout
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Desktop Navigation Tabs -->
+                <div class="nav-tabs" id="navTabs">
+                    <!-- Dynamic tabs will be inserted here -->
+                </div>
+
+                <main class="content" id="content">
+                    <!-- Dynamic content will be inserted here -->
+                </main>
+
+                <!-- Mobile Bottom Navigation -->
+                <div class="bottom-nav" id="bottomNav">
+                    <!-- Dynamic bottom nav will be inserted here -->
+                </div>
+
+                <!-- Notifications -->
+                <div class="notifications" id="notifications"></div>
+            `;
+            
+            switchRole(currentRole);
+        }
+
+        // Role switching
+        function switchRole(role) {
+            if (!isLoggedIn) return;
+            
+            currentRole = role;
+            currentTab = role === 'admin' ? 'dishes' : 'menu';
+            
+            updateNavigation();
+            updateContent();
+        }
+
+        // Navigation
+        function updateNavigation() {
+            const navTabs = document.getElementById('navTabs');
+            const bottomNav = document.getElementById('bottomNav');
+            
+            let tabs = [];
+            if (currentRole === 'admin') {
+                tabs = [
+                    { id: 'dishes', label: 'Manage Dishes', icon: '🍽️' },
+                    { id: 'orders', label: 'Orders', icon: '📋' },
+                    { id: 'daycontrol', label: 'Day Control', icon: '📅' },
+                    { id: 'analytics', label: 'Analytics', icon: '📊' }
+                ];
+            } else {
+                tabs = [
+                    { id: 'menu', label: 'Menu', icon: '🍽️' },
+                    { id: 'cart', label: `Cart${cart.length ? ` (${cart.length})` : ''}`, icon: '🛒' },
+                    { id: 'myorders', label: 'My Orders', icon: '📋' }
+                ];
+            }
+            
+            // Desktop tabs
+            navTabs.innerHTML = tabs.map(tab => 
+                `<button class="nav-tab ${tab.id === currentTab ? 'active' : ''}" 
+                         onclick="switchTab('${tab.id}')">${tab.label}</button>`
+            ).join('');
+            
+            // Mobile bottom nav
+            bottomNav.innerHTML = tabs.map(tab => 
+                `<button class="bottom-nav-item ${tab.id === currentTab ? 'active' : ''}" 
+                         onclick="switchTab('${tab.id}')">
+                    <span class="icon">${tab.icon}</span>
+                    <span>${tab.label}</span>
+                </button>`
+            ).join('');
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            updateNavigation();
+            updateContent();
+        }
+
+        // Content rendering
+        function updateContent() {
+            const content = document.getElementById('content');
+            
+            switch (currentTab) {
+                case 'menu':
+                    content.innerHTML = renderMenu();
+                    break;
+                case 'cart':
+                    content.innerHTML = renderCart();
+                    break;
+                case 'myorders':
+                    content.innerHTML = renderMyOrders();
+                    break;
+                case 'dishes':
+                    content.innerHTML = renderDishManagement();
+                    break;
+                case 'orders':
+                    content.innerHTML = renderOrderManagement();
+                    break;
+                case 'daycontrol':
+                    content.innerHTML = renderDayControl();
+                    break;
+                case 'analytics':
+                    content.innerHTML = renderAnalytics();
+                    break;
+            }
+        }
+
+        // Customer views
+        function renderMenu() {
+            if (!isLoggedIn) return '';
+            
+            const todayDishes = getCurrentDayDishes();
+            const mainDishes = todayDishes.filter(dish => dish.isMainDish && dish.available);
+            const otherDishes = todayDishes.filter(dish => !dish.isMainDish && dish.available);
+            const allDishes = [...mainDishes, ...otherDishes];
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Welcome to Forbes Marshall Cafeteria</h2>
+                        <p class="card-description">Hello ${currentUser.name}! Today's ${getCurrentDayName()} Special Menu</p>
+                    </div>
+                    <div class="card-content" style="text-align: center;">
+                        <div style="background: var(--secondary); color: white; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem;">
+                            📅 ${getCurrentDayName()}'s Menu - ${allDishes.length} dishes available
+                            ${adminSelectedDay ? `<br><small style="opacity: 0.8;">(Admin Override - Today is ${getActualCurrentDayName()})</small>` : ''}
+                        </div>
+                        <button class="btn btn-outline" onclick="showWeeklyMenu()" style="margin: 0.25rem;">
+                            📋 View Weekly Menu
+                        </button>
+                    </div>
+                </div>
+
+                ${allDishes.length > 0 ? `
+                    <div class="dish-grid">
+                        ${allDishes.map(dish => `
+                            <div class="dish-card ${dish.isMainDish ? 'main-dish' : ''}">
+                                <img src="${dish.image}" alt="${dish.name}" class="dish-image" onerror="this.src='https://placeholder-image-service.onrender.com/image/300x200?prompt=Delicious food dish with appetizing presentation on white plate&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq'">
+                                <div class="dish-info">
+                                    <h3 class="dish-name">${dish.name}</h3>
+                                    <p class="dish-description">${dish.description}</p>
+                                    <div class="dish-details">
+                                        <span class="dish-price">₹${dish.price}</span>
+                                        <span class="dish-category">${dish.category}</span>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="addToCart('${dish.id}')" style="width: 100%;">
+                                        Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : `
+                    <div class="card">
+                        <div class="card-content" style="text-align: center; padding: 2rem;">
+                            <h3>No dishes available for ${getCurrentDayName()}</h3>
+                            <p style="color: var(--text-light);">Please check back tomorrow or contact the canteen staff.</p>
+                        </div>
+                    </div>
+                `}
+            `;
+        }
+
+        function renderCart() {
+            if (cart.length === 0) {
+                return `
+                    <div class="card">
+                        <div class="card-content" style="text-align: center; padding: 2rem;">
+                            <h2>Your cart is empty</h2>
+                            <p style="color: var(--text-light); margin: 1rem 0;">Add some delicious items from our menu!</p>
+                            <button class="btn btn-primary" onclick="switchTab('menu')">Browse Menu</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.dish.price * item.quantity), 0);
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Order</h2>
+                        <p class="card-description">Review your items before placing order</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="label">Your Name</label>
+                            <input type="text" class="input" value="${customerName}" 
+                                   onchange="customerName = this.value" placeholder="Enter your name" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-content">
+                        ${cart.map(item => `
+                            <div class="cart-item">
+                                <div>
+                                    <strong>${item.dish.name}</strong><br>
+                                    <small style="color: var(--text-light);">₹${item.dish.price} × ${item.quantity}</small>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                    <span>₹${item.dish.price * item.quantity}</span>
+                                    <button class="btn btn-small btn-outline" onclick="removeFromCart('${item.dish.id}')">Remove</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                        
+                        <div class="cart-total">
+                            Total: ₹${total}
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="placeOrder()" style="width: 100%; margin-top: 1rem;">
+                            Place Order
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMyOrders() {
+            const customerOrders = orders.filter(order => order.customerName === customerName);
+            
+            if (customerOrders.length === 0) {
+                return `
+                    <div class="card">
+                        <div class="card-content" style="text-align: center; padding: 2rem;">
+                            <h2>No orders yet</h2>
+                            <p style="color: var(--text-light); margin: 1rem 0;">Your order history will appear here</p>
+                            <button class="btn btn-primary" onclick="switchTab('menu')">Order Now</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Your Orders</h2>
+                        <p class="card-description">Track your order status</p>
+                    </div>
+                </div>
+
+                ${customerOrders.reverse().map(order => `
+                    <div class="card order-card">
+                        <div class="card-content">
+                            <div class="order-header">
+                                <div>
+                                    <div class="order-id">Order #${order.id.slice(-4)}</div>
+                                    <small style="color: var(--text-light);">${formatDate(order.orderTime)}</small>
+                                </div>
+                                <span class="order-status status-${order.status}">${order.status.toUpperCase()}</span>
+                            </div>
+                            
+                            <div style="margin: 1rem 0;">
+                                ${order.dishes.map(item => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>${item.dish.name} × ${item.quantity}</span>
+                                        <span>₹${item.dish.price * item.quantity}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div style="border-top: 1px solid var(--border); padding-top: 1rem; font-weight: 600;">
+                                Total: ₹${order.totalAmount}
+                            </div>
+                            
+                            ${order.status === 'ready' ? 
+                                `<div style="background: var(--success); color: white; padding: 1rem; border-radius: 8px; margin-top: 1rem; text-align: center;">
+                                    🎉 Your order is ready for pickup!
+                                </div>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
+
+        // Admin views
+        function renderDishManagement() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Weekly Menu Management</h2>
+                        <p class="card-description">Manage dishes for each day of the week</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="label">Select Day</label>
+                            <select class="select" id="selectedDay">
+                                ${days.map((day, index) => `
+                                    <option value="${dayKeys[index]}" ${dayKeys[index] === getCurrentDayName().toLowerCase() ? 'selected' : ''}>${day}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <button class="btn btn-outline" onclick="loadDayDishes()" style="margin-bottom: 1rem;">
+                            Load Day's Menu
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Add New Dish to Selected Day</h2>
+                        <p class="card-description">Add dishes to the weekly menu</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="label">Dish Name</label>
+                            <input type="text" class="input" id="dishName" placeholder="Enter dish name">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Description</label>
+                            <textarea class="textarea" id="dishDescription" placeholder="Describe the dish"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Price (₹)</label>
+                            <input type="number" class="input" id="dishPrice" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Category</label>
+                            <select class="select" id="dishCategory">
+                                <option value="">Select category</option>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Lunch">Lunch</option>
+                                <option value="Dinner">Dinner</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="label">Dish Image</label>
+                            <input type="file" class="input" id="dishImage" accept="image/*" onchange="previewImage(this)">
+                            <div id="imagePreview" style="margin-top: 1rem; text-align: center;"></div>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" class="checkbox" id="isMainDish">
+                            <label class="label" for="isMainDish">Mark as Main Dish (Highlighted)</label>
+                        </div>
+                        <button class="btn btn-primary" onclick="addNewDishToWeeklyMenu()">Add to Weekly Menu</button>
+                    </div>
+                </div>
+
+                <div class="card" id="dayDishesContainer">
+                    <div class="card-header">
+                        <h2 class="card-title">Current Day's Menu</h2>
+                        <p class="card-description">Click "Load Day's Menu" to view dishes</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOrderManagement() {
+            if (orders.length === 0) {
+                return `
+                    <div class="card">
+                        <div class="card-content" style="text-align: center; padding: 2rem;">
+                            <h2>No orders yet</h2>
+                            <p style="color: var(--text-light);">Orders will appear here as customers place them</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const pendingOrders = orders.filter(order => order.status === 'pending' || order.status === 'preparing');
+            const completedOrders = orders.filter(order => order.status === 'ready' || order.status === 'completed');
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Order Management</h2>
+                        <p class="card-description">Manage customer orders and mark them as ready</p>
+                    </div>
+                </div>
+
+                ${pendingOrders.length > 0 ? `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Active Orders (${pendingOrders.length})</h3>
+                        </div>
+                        <div class="card-content">
+                            ${pendingOrders.map(order => renderOrderCard(order, true)).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${completedOrders.length > 0 ? `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Completed Orders</h3>
+                        </div>
+                        <div class="card-content">
+                            ${completedOrders.slice(0, 10).map(order => renderOrderCard(order, false)).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        function renderOrderCard(order, showActions) {
+            return `
+                <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">Order #${order.id.slice(-4)}</div>
+                            <strong>${order.customerName}</strong><br>
+                            <small style="color: var(--text-light);">${formatDate(order.orderTime)}</small>
+                        </div>
+                        <span class="order-status status-${order.status}">${order.status.toUpperCase()}</span>
+                    </div>
+                    
+                    <div style="margin: 1rem 0;">
+                        ${order.dishes.map(item => `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>${item.dish.name} × ${item.quantity}</span>
+                                <span>₹${item.dish.price * item.quantity}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--border); padding-top: 1rem; font-weight: 600;">
+                        Total: ₹${order.totalAmount}
+                    </div>
+                    
+                    ${showActions && order.status !== 'ready' ? `
+                        <div style="margin-top: 1rem;">
+                            <button class="btn btn-secondary" onclick="markOrderReady('${order.id}')">
+                                Mark as Ready
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${order.readyTime ? `
+                        <div style="color: var(--success); font-weight: 500; margin-top: 0.5rem;">
+                            ✅ Ready at ${formatDate(order.readyTime)}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Day Control Panel for Admin
+        function renderDayControl() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const currentActualDay = getActualCurrentDayName();
+            const currentShowingDay = getCurrentDayName();
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">📅 Day Control Panel</h2>
+                        <p class="card-description">Control which day's menu customers see</p>
+                    </div>
+                    <div class="card-content">
+                        <div style="background: ${adminSelectedDay ? 'var(--warning)' : 'var(--success)'}; color: white; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <strong>📅 Current Status</strong>
+                                ${adminSelectedDay ? `<span style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">OVERRIDE ACTIVE</span>` : `<span style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">AUTO MODE</span>`}
+                            </div>
+                            <div>Today is: <strong>${currentActualDay}</strong></div>
+                            <div>Customers see: <strong>${currentShowingDay}'s Menu</strong></div>
+                            ${adminSelectedDay ? `<div style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem;">You have overridden the automatic daily menu system.</div>` : `<div style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem;">Customers automatically see today's menu.</div>`}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Override Customer Menu</h3>
+                        <p class="card-description">Select which day's menu customers should see</p>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; gap: 0.5rem; margin-bottom: 1rem;">
+                            ${adminSelectedDay ? `
+                                <button class="btn btn-secondary" onclick="resetToAutoMode()" style="margin-bottom: 1rem;">
+                                    🔄 Reset to Auto Mode (Show Today's Menu)
+                                </button>
+                            ` : ''}
+                            
+                            ${days.map((day, index) => {
+                                const dayKey = dayKeys[index];
+                                const dishCount = (weeklyMenu[dayKey] || []).length;
+                                const isSelected = adminSelectedDay === dayKey;
+                                const isToday = day === currentActualDay;
+                                
+                                return `
+                                    <button class="btn ${isSelected ? 'btn-primary' : 'btn-outline'}" 
+                                            onclick="setCustomerMenuDay('${dayKey}')"
+                                            style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+                                        <div>
+                                            <strong>${day}</strong>
+                                            ${isToday ? '<span style="margin-left: 0.5rem; font-size: 0.75rem; opacity: 0.7;">(Today)</span>' : ''}
+                                            ${isSelected ? '<span style="margin-left: 0.5rem; font-size: 0.75rem; opacity: 0.7;">(Selected)</span>' : ''}
+                                        </div>
+                                        <span style="background: ${isSelected ? 'rgba(255,255,255,0.2)' : 'var(--background)'}; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
+                                            ${dishCount} dishes
+                                        </span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                        
+                        <div style="background: var(--background); border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                            <h4 style="margin-bottom: 0.5rem; color: var(--text);">💡 How it works:</h4>
+                            <ul style="margin-left: 1rem; color: var(--text-light); font-size: 0.875rem; line-height: 1.6;">
+                                <li><strong>Auto Mode:</strong> Customers see today's menu automatically</li>
+                                <li><strong>Override Mode:</strong> You can show any day's menu to customers</li>
+                                <li>This is useful for special events, testing, or when you want to serve a different day's menu</li>
+                                <li>Changes take effect immediately for all customers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Preview Customer Menu</h3>
+                        <p class="card-description">See what customers are currently seeing</p>
+                    </div>
+                    <div class="card-content">
+                        ${renderCustomerMenuPreview()}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCustomerMenuPreview() {
+            const todayDishes = getCurrentDayDishes();
+            const mainDishes = todayDishes.filter(dish => dish.isMainDish && dish.available);
+            const otherDishes = todayDishes.filter(dish => !dish.isMainDish && dish.available);
+            const allDishes = [...mainDishes, ...otherDishes];
+
+            if (allDishes.length === 0) {
+                return `
+                    <div style="text-align: center; padding: 2rem; background: var(--background); border-radius: 8px;">
+                        <h4>No dishes available for ${getCurrentDayName()}</h4>
+                        <p style="color: var(--text-light);">Customers will see a "no dishes available" message.</p>
+                    </div>
+                `;
+            }
+
+            return `
+                <div style="background: var(--background); border-radius: 8px; padding: 1rem;">
+                    <div style="margin-bottom: 1rem; padding: 0.75rem; background: var(--secondary); color: white; border-radius: 6px; text-align: center;">
+                        📅 ${getCurrentDayName()}'s Menu - ${allDishes.length} dishes available
+                    </div>
+                    
+                    <div style="display: grid; gap: 0.5rem; max-height: 300px; overflow-y: auto;">
+                        ${allDishes.map(dish => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: white; border-radius: 6px; border: 1px solid var(--border); ${dish.isMainDish ? 'border-left: 4px solid var(--secondary);' : ''}">
+                                <div>
+                                    <strong>${dish.name}</strong>
+                                    ${dish.isMainDish ? '<span style="margin-left: 0.5rem; background: var(--secondary); color: white; padding: 0.125rem 0.375rem; border-radius: 3px; font-size: 0.625rem;">MAIN</span>' : ''}
+                                    <br><small style="color: var(--text-light);">${dish.description}</small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: 600; color: var(--primary);">₹${dish.price}</div>
+                                    <small style="color: var(--text-light);">${dish.category}</small>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAnalytics() {
+            const totalOrders = orders.length;
+            const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
+            const popularDishes = getPopularDishes();
+            const todayOrders = orders.filter(order => isToday(order.orderTime));
+
+            return `
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Analytics Dashboard</h2>
+                        <p class="card-description">Business insights and statistics</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="card">
+                        <div class="card-content" style="text-align: center;">
+                            <h3 style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--primary);">${totalOrders}</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content" style="text-align: center;">
+                            <h3 style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--secondary);">₹${totalRevenue}</h3>
+                            <p>Total Revenue</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-content" style="text-align: center;">
+                            <h3 style="font-size: 2rem; margin-bottom: 0.5rem; color: var(--warning);">${todayOrders.length}</h3>
+                            <p>Today's Orders</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Popular Dishes</h3>
+                    </div>
+                    <div class="card-content">
+                        ${popularDishes.length > 0 ? popularDishes.map(item => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                                <span>${item.dish.name}</span>
+                                <div>
+                                    <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 12px;">
+                                        ${item.count} orders
+                                    </span>
+                                </div>
+                            </div>
+                        `).join('') : '<p>No orders yet to show popular dishes</p>'}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                    </div>
+                    <div class="card-content">
+                        ${orders.slice(-5).reverse().map(order => `
+                            <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                    <strong>Order #${order.id.slice(-4)}</strong>
+                                    <span style="color: var(--text-light); font-size: 0.875rem;">${formatDate(order.orderTime)}</span>
+                                </div>
+                                <div style="color: var(--text-light); font-size: 0.875rem;">
+                                    ${order.customerName} • ₹${order.totalAmount} • ${order.status}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show weekly menu modal
+        function showWeeklyMenu() {
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            
+            const modal = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1001; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-y: auto;" onclick="closeWeeklyMenu(event)">
+                    <div class="card" style="max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto;" onclick="event.stopPropagation();">
+                        <div class="card-header">
+                            <h3 class="card-title">📅 Weekly Menu Schedule</h3>
+                            <p class="card-description">Forbes Marshall Canteen - Fixed weekly menu</p>
+                        </div>
+                        <div class="card-content">
+                            ${days.map((day, index) => {
+                                const dayKey = dayKeys[index];
+                                const dayDishes = weeklyMenu[dayKey] || [];
+                                const isToday = day === getCurrentDayName();
+                                
+                                return `
+                                    <div style="border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; ${isToday ? 'border-color: var(--secondary); background: rgba(16, 185, 129, 0.05);' : ''}">
+                                        <div style="padding: 1rem; border-bottom: 1px solid var(--border); ${isToday ? 'background: var(--secondary); color: white;' : ''}">
+                                            <h4 style="margin: 0;">${day} ${isToday ? '(Today)' : ''}</h4>
+                                        </div>
+                                        <div style="padding: 1rem;">
+                                            ${dayDishes.length > 0 ? dayDishes.map(dish => `
+                                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; padding: 0.5rem; background: var(--background); border-radius: 4px;">
+                                                    <div>
+                                                        <strong>${dish.name}</strong>
+                                                        <br><small style="color: var(--text-light);">${dish.description}</small>
+                                                    </div>
+                                                    <span style="font-weight: 600; color: var(--primary);">₹${dish.price}</span>
+                                                </div>
+                                            `).join('') : '<p style="color: var(--text-light); text-align: center;">No dishes scheduled</p>'}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                            
+                            <button class="btn btn-primary" onclick="closeWeeklyMenu()" style="width: 100%; margin-top: 1rem;">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modal);
+        }
+
+        function closeWeeklyMenu(event) {
+            if (event && event.target !== event.currentTarget) return;
+            
+            const modal = document.querySelector('[style*="z-index: 1001"]');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Weekly menu management functions
+        function loadDayDishes() {
+            const selectedDay = document.getElementById('selectedDay').value;
+            const dayName = selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1);
+            const dayDishes = weeklyMenu[selectedDay] || [];
+            
+            const container = document.getElementById('dayDishesContainer');
+            container.innerHTML = `
+                <div class="card-header">
+                    <h2 class="card-title">${dayName}'s Menu (${dayDishes.length} dishes)</h2>
+                    <p class="card-description">Manage dishes for ${dayName}</p>
+                </div>
+                <div class="card-content">
+                    ${dayDishes.length > 0 ? `
+                        <div class="dish-grid">
+                            ${dayDishes.map(dish => `
+                                <div class="dish-card ${dish.isMainDish ? 'main-dish' : ''}">
+                                    <img src="${dish.image}" alt="${dish.name}" class="dish-image" onerror="this.src='https://placeholder-image-service.onrender.com/image/300x200?prompt=Delicious food dish with appetizing presentation on white plate&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq'">
+                                    <div class="dish-info">
+                                        <h3 class="dish-name">${dish.name}</h3>
+                                        <p class="dish-description">${dish.description}</p>
+                                        <div class="dish-details">
+                                            <span class="dish-price">₹${dish.price}</span>
+                                            <span class="dish-category">${dish.category}</span>
+                                        </div>
+                                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                                            <button class="btn btn-small ${dish.isMainDish ? 'btn-secondary' : 'btn-outline'}" 
+                                                    onclick="toggleMainDishWeekly('${selectedDay}', '${dish.id}')">
+                                                ${dish.isMainDish ? 'Remove Highlight' : 'Make Main Dish'}
+                                            </button>
+                                            <button class="btn btn-small ${dish.available ? 'btn-outline' : 'btn-secondary'}" 
+                                                    onclick="toggleAvailabilityWeekly('${selectedDay}', '${dish.id}')">
+                                                ${dish.available ? 'Disable' : 'Enable'}
+                                            </button>
+                                            <button class="btn btn-small btn-danger" onclick="removeDishFromDay('${selectedDay}', '${dish.id}')">
+                                                Remove
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : `
+                        <div style="text-align: center; padding: 2rem;">
+                            <p style="color: var(--text-light);">No dishes added for ${dayName} yet.</p>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function addNewDishToWeeklyMenu() {
+            const nameEl = document.getElementById('dishName');
+            const descEl = document.getElementById('dishDescription');
+            const priceEl = document.getElementById('dishPrice');
+            const categoryEl = document.getElementById('dishCategory');
+            const mainDishEl = document.getElementById('isMainDish');
+            const imageEl = document.getElementById('dishImage');
+            const selectedDayEl = document.getElementById('selectedDay');
+            
+            if (!nameEl || !descEl || !priceEl || !categoryEl || !mainDishEl || !imageEl || !selectedDayEl) {
+                showNotification('Form elements not found. Please refresh the page.', 'warning');
+                return;
+            }
+
+            const name = nameEl.value.trim();
+            const description = descEl.value.trim();
+            const price = parseFloat(priceEl.value);
+            const category = categoryEl.value;
+            const isMainDish = mainDishEl.checked;
+            const imageFile = imageEl.files[0];
+            const selectedDay = selectedDayEl.value;
+
+            if (!name || !price || !category || !selectedDay) {
+                showNotification('Please fill all required fields (Name, Price, Category, Day)', 'warning');
+                return;
+            }
+
+            if (price <= 0) {
+                showNotification('Price must be greater than 0', 'warning');
+                return;
+            }
+
+            // Create dish object with default image
+            const dish = {
+                id: `${selectedDay}-${Date.now()}`,
+                name,
+                description,
+                price,
+                category,
+                isMainDish,
+                image: 'https://placeholder-image-service.onrender.com/image/300x200?prompt=Delicious food dish with appetizing presentation on white plate with garnish and colorful ingredients&id=491abbd5-cb89-4e58-bba3-e1de43238d05&customer_id=cus_T5otM26I3OXoHq',
+                available: true
+            };
+
+            // If image is uploaded, convert to base64
+            if (imageFile) {
+                showNotification('Processing image...', 'info');
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        dish.image = e.target.result;
+                        finalizeDishAdditionToWeeklyMenu(dish, selectedDay);
+                    } catch (error) {
+                        console.error('Error processing image:', error);
+                        showNotification('Error processing image, using default', 'warning');
+                        finalizeDishAdditionToWeeklyMenu(dish, selectedDay);
+                    }
+                };
+                reader.onerror = function() {
+                    showNotification('Error reading image, using default', 'warning');
+                    finalizeDishAdditionToWeeklyMenu(dish, selectedDay);
+                };
+                
+               reader.readAsDataURL(imageFile);
+
+                reader.readAsDataURL(imageFile);
+            } else {
+                finalizeDishAdditionToWeeklyMenu(dish, selectedDay);
+            }
+        }
+
+        function finalizeDishAdditionToWeeklyMenu(dish, selectedDay) {
+            try {
+                if (!weeklyMenu[selectedDay]) {
+                    weeklyMenu[selectedDay] = [];
+                }
+                weeklyMenu[selectedDay].push(dish);
+                
+                const dayName = selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1);
+                showNotification(`✅ ${dish.name} added to ${dayName}'s menu!`, 'success');
+                
+                // Clear form
+                const elements = [
+                    'dishName', 'dishDescription', 'dishPrice', 
+                    'dishCategory', 'isMainDish', 'dishImage'
+                ];
+                
+                elements.forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        if (element.type === 'checkbox') {
+                            element.checked = false;
+                        } else {
+                            element.value = '';
+                        }
+                    }
+                });
+                
+                // Clear preview
+                const preview = document.getElementById('imagePreview');
+                if (preview) {
+                    preview.innerHTML = '';
+                }
+                
+                // Reload the day's dishes
+                loadDayDishes();
+            } catch (error) {
+                console.error('Error adding dish:', error);
+                showNotification('Error adding dish. Please try again.', 'warning');
+            }
+        }
+
+        function toggleMainDishWeekly(day, dishId) {
+            const dish = weeklyMenu[day]?.find(d => d.id === dishId);
+            if (dish) {
+                dish.isMainDish = !dish.isMainDish;
+                showNotification(`${dish.name} ${dish.isMainDish ? 'marked as main dish' : 'removed from main dishes'}`, 'success');
+                loadDayDishes();
+            }
+        }
+
+        function toggleAvailabilityWeekly(day, dishId) {
+            const dish = weeklyMenu[day]?.find(d => d.id === dishId);
+            if (dish) {
+                dish.available = !dish.available;
+                showNotification(`${dish.name} ${dish.available ? 'enabled' : 'disabled'}`, 'success');
+                loadDayDishes();
+            }
+        }
+
+        function removeDishFromDay(day, dishId) {
+            const dayDishes = weeklyMenu[day] || [];
+            const dish = dayDishes.find(d => d.id === dishId);
+            if (dish) {
+                weeklyMenu[day] = dayDishes.filter(d => d.id !== dishId);
+                showNotification(`${dish.name} removed from menu`, 'success');
+                loadDayDishes();
+            }
+        }
+
+        function setCustomerMenuDay(dayKey) {
+            adminSelectedDay = dayKey;
+            const dayName = dayKey.charAt(0).toUpperCase() + dayKey.slice(1);
+            showNotification(`🎯 Customer menu set to ${dayName}`, 'success');
+            updateContent();
+            
+            // Also notify that this affects all customers
+            setTimeout(() => {
+                showNotification(`All customers now see ${dayName}'s menu`, 'info');
+            }, 1500);
+        }
+
+        function resetToAutoMode() {
+            adminSelectedDay = null;
+            showNotification('🔄 Reset to auto mode - customers see today\'s menu', 'success');
+            updateContent();
+        }
+
+        // Image preview function
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (!preview) return;
+            
+            if (input.files && input.files[0]) {
+                // Validate file type
+                const file = input.files[0];
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Please select a valid image file', 'warning');
+                    input.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Image size must be less than 5MB', 'warning');
+                    input.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid var(--border); object-fit: cover;">
+                        <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-light);">Image preview - ${(file.size / 1024).toFixed(1)} KB</p>
+                    `;
+                };
+                reader.onerror = function() {
+                    showNotification('Error reading image file', 'warning');
+                    preview.innerHTML = '';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        // Actions
+        function addToCart(dishId) {
+            const todayDishes = getCurrentDayDishes();
+            const dish = todayDishes.find(d => d.id === dishId);
+            if (!dish || !dish.available) return;
+
+            const existingItem = cart.find(item => item.dish.id === dishId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ dish, quantity: 1 });
+            }
+
+            showNotification(`${dish.name} added to cart`, 'success');
+            updateNavigation();
+        }
+
+        function removeFromCart(dishId) {
+            cart = cart.filter(item => item.dish.id !== dishId);
+            updateContent();
+            updateNavigation();
+        }
+
+        function placeOrder() {
+            if (!customerName.trim()) {
+                showNotification('Please enter your name', 'warning');
+                return;
+            }
+            if (cart.length === 0) {
+                showNotification('Please add items to cart', 'warning');
+                return;
+            }
+
+            const totalAmount = cart.reduce((sum, item) => sum + (item.dish.price * item.quantity), 0);
+            const order = {
+                id: Date.now().toString(),
+                customerName: customerName.trim(),
+                dishes: [...cart],
+                totalAmount,
+                status: 'pending',
+                orderTime: new Date()
+            };
+
+            orders.push(order);
+            cart = [];
+            
+            showNotification(`Order placed successfully! Order #${order.id.slice(-4)}`, 'success');
+            showBrowserNotification(`Order Confirmed`, `Your order #${order.id.slice(-4)} has been placed successfully!`);
+            
+            switchTab('myorders');
+        }
+
+        function markOrderReady(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'ready';
+                order.readyTime = new Date();
+                
+                showNotification(`Order #${orderId.slice(-4)} marked as ready!`, 'success');
+                showBrowserNotification(`Order Ready`, `Order #${orderId.slice(-4)} for ${order.customerName} is ready for pickup!`);
+                
+                updateContent();
+            }
+        }
+
+        // Notifications
+        function showNotification(message, type = 'info') {
+            const notification = {
+                id: Date.now().toString(),
+                message,
+                type,
+                timestamp: new Date()
+            };
+
+            notifications.unshift(notification);
+            if (notifications.length > 5) {
+                notifications = notifications.slice(0, 5);
+            }
+
+            renderNotifications();
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                notifications = notifications.filter(n => n.id !== notification.id);
+                renderNotifications();
+            }, 5000);
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notifications');
+            if (container) {
+                container.innerHTML = notifications.map(notification => `
+                    <div class="notification ${notification.type}">
+                        ${notification.message}
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showBrowserNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body,
+                    icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iIzE2Mjc0M2EiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjIxNiIgaGVpZ2h0PSIyNjYiIHJ4PSIxNiIgZmlsbD0iIzQyYTc2NyIvPjxwYXRoIGQ9Ik02ZjU1LjE0MGw3MmkxMzFpNDNpLjQ5aDZsOS1sMS5sMGguMzNoNy01aDF2LTg3aDEydjczaFMxIiBmaWxsPSIjZmZmZmYiLz48L3N2Zz4=',
+                    badge: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iIzE2Mjc0M2EiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjIxNiIgaGVpZ2h0PSIyNjYiIHJ4PSIxNiIgZmlsbD0iIzQyYTc2NyIvPjxwYXRoIGQ9Ik02ZjU1LjE0MGw3MmkxMzFpNDNpLjQ5aDZsOS1sMS5sMGguMzNoNy01aDF2LTg3aDEydjczaFMxIiBmaWxsPSIjZmZmZmYiLz48L3N2Zz4='
+                });
+            }
+        }
+
+        // Touch gestures for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipeGesture();
+        });
+
+        function handleSwipeGesture() {
+            const swipeThreshold = 100;
+            const swipeDistance = touchEndX - touchStartX;
+            
+            if (Math.abs(swipeDistance) > swipeThreshold) {
+                // Add swipe navigation if needed
+            }
+        }
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+    </script>
+</body>
+</html>
